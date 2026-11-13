@@ -1,0 +1,25 @@
+{
+  "name": "cercle-des-allocations",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "cgu": "node -e \"const f=require('fs');f.writeFileSync('content/cgu.ts','// Généré depuis content/cgu.md : relancer npm run cgu après modification.\\nexport const CGU = '+JSON.stringify(f.readFileSync('content/cgu.md','utf8'))+';\\n')\""
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.45.4",
+    "next": "14.2.15",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.11",
+    "@types/react": "18.3.11",
+    "@types/react-dom": "18.3.1",
+    "typescript": "5.6.3"
+  }
+}
