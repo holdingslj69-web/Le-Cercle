@@ -30,8 +30,11 @@ Les règles sensibles sont appliquées **dans la base** (fichier `supabase-schem
 1. Créer un projet, région **Europe (Paris ou Francfort)**.
 2. **SQL Editor** → coller tout `supabase-schema.sql` → *Run*. Remplacer d'abord `[votre-domaine]` dans la ligne `cgu_versions`.
 3. **Authentication → URL Configuration** : *Site URL* = l'adresse du site ; *Redirect URLs* : `https://votre-domaine/auth/callback` (et `http://localhost:3000/auth/callback` pour les essais).
-4. **Authentication → Emails → SMTP** : brancher un expéditeur (Brevo, Resend…) ; l'envoi intégré de Supabase est limité à quelques e-mails par heure.
-5. Se connecter une première fois sur le site avec l'adresse de l'administrateur, puis dans **SQL Editor** :
+4. **Authentication → Emails → Templates** : dans les modèles **Magic Link** et **Confirm signup**, remplacer le lien par
+   `<a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email">Me connecter</a>`
+   et ajouter la ligne `Ou entrez ce code : {{ .Token }}`. Ainsi le lien marche même ouvert depuis l'application Mail ou un autre appareil.
+5. **Authentication → Emails → SMTP** : brancher un expéditeur (Brevo, Resend…) ; l'envoi intégré de Supabase est limité à quelques e-mails par heure.
+6. Se connecter une première fois sur le site avec l'adresse de l'administrateur, puis dans **SQL Editor** :
    ```sql
    insert into public.admins (user_id)
    select id from auth.users where email = 'adresse-de-l-administrateur@exemple.fr';
