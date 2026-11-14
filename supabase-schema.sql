@@ -13,7 +13,10 @@ create table public.naf_codes (
   code   text primary key,
   label  text not null
 );
+-- 64.20Z et 70.10Z : réservés à l'inscription de l'administrateur (holding), refusés aux autres membres par le site
 insert into public.naf_codes (code, label) values
+  ('64.20Z','Activités des sociétés holding'),
+  ('70.10Z','Activités des sièges sociaux'),
   ('56.10A','Restauration traditionnelle'),
   ('56.10B','Cafétérias et autres libres-services'),
   ('56.10C','Restauration de type rapide'),

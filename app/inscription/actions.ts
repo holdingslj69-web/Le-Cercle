@@ -21,7 +21,9 @@ export async function saveProfile(_: unknown, fd: FormData): Promise<{ error?: s
   const info = await lookupSiret(v("siret"));
   if (!info.ok) return { error: info.error };
   if (!info.active) return { error: "Cet établissement n'est pas actif au registre des entreprises." };
-  if (!info.nafAllowed) return { error: `Le code d'activité ${info.naf} (${info.nafLabel}) ne permet pas l'accès au Cercle, réservé aux métiers de la restauration, du vin et des spiritueux.` };
+  // L'administrateur du Cercle peut s'inscrire avec sa société (holding) : le contrôle d'activité ne s'applique pas à lui
+  const { data: isAdmin } = await supabase.from("admins").select("user_id").eq("user_id", user.id).maybeSingle();
+  if (!info.nafAllowed && !isAdmin) return { error: `Le code d'activité ${info.naf} (${info.nafLabel}) ne permet pas l'accès au Cercle, réservé aux métiers de la restauration, du vin et des spiritueux.` };
 
   const { data: existing } = await supabase.from("members").select("id,status").eq("id", user.id).maybeSingle();
   const member = { id: user.id, pseudo: v("pseudo"), kind, plan: v("plan") === "pro" ? "pro" : "occasionnel", city: info.city };
