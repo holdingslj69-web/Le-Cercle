@@ -14,8 +14,8 @@ function Submit({ label }: { label: string }) {
   return <button className="btn primary block" type="submit" disabled={pending}>{pending ? "Vérification…" : label}</button>;
 }
 
-export default function ProfileForm({ uid, member, priv, cguAccepted, cguUrl, cguVersion }:
-  { uid: string; member: Member | null; priv: Priv; cguAccepted: string | null; cguUrl: string; cguVersion: string }) {
+export default function ProfileForm({ admin = false, uid, member, priv, cguAccepted, cguUrl, cguVersion }:
+  { admin?: boolean; uid: string; member: Member | null; priv: Priv; cguAccepted: string | null; cguUrl: string; cguVersion: string }) {
   const [state, action] = useFormState(saveProfile, {} as { error?: string; ok?: boolean });
   const [kind, setKind] = useState(member?.kind ?? "");
   const [plan, setPlan] = useState<string>(member?.plan ?? "occasionnel");
@@ -50,10 +50,10 @@ export default function ProfileForm({ uid, member, priv, cguAccepted, cguUrl, cg
           </div>
           {info && !info.ok && <p className="hint">{info.error}</p>}
           {info?.ok && (
-            <div className={info.nafAllowed && info.active ? "notice ok" : "notice"}>
+            <div className={(info.nafAllowed || admin) && info.active ? "notice ok" : "notice"}>
               <b>{info.name}</b><br />{info.address}<br />
               Code NAF {info.naf} {info.nafLabel ? `· ${info.nafLabel}` : ""} · TVA {info.vat}<br />
-              {!info.active ? "Établissement fermé au registre : inscription impossible." : info.nafAllowed ? "Activité autorisée au Cercle." : "Ce code d'activité ne permet pas l'accès au Cercle, réservé aux métiers de la restauration, du vin et des spiritueux."}
+              {!info.active ? "Établissement fermé au registre : inscription impossible." : info.nafAllowed ? "Activité autorisée au Cercle." : admin ? "Compte administrateur : votre société est acceptée." : "Ce code d'activité ne permet pas l'accès au Cercle, réservé aux métiers de la restauration, du vin et des spiritueux."}
             </div>
           )}
         </div>
