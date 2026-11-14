@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC = ["/", "/connexion", "/auth", "/cgu"];
+const PUBLIC = ["/", "/connexion", "/auth", "/cgu", "/bientot"];
 
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req });
@@ -17,6 +17,13 @@ export async function middleware(req: NextRequest) {
   });
   const { data: { user } } = await supabase.auth.getUser();
   const path = req.nextUrl.pathname;
+
+  // Mode « bientôt » : variable MAINTENANCE=on sur l'hébergeur. Seul l'administrateur voit le site.
+  if (process.env.MAINTENANCE === "on" && !["/bientot", "/connexion", "/auth/callback", "/cgu"].some((p) => path.startsWith(p))) {
+    const { data: admin } = user ? await supabase.from("admins").select("user_id").eq("user_id", user.id).maybeSingle() : { data: null };
+    if (!admin) { const url = req.nextUrl.clone(); url.pathname = "/bientot"; url.search = ""; return NextResponse.rewrite(url); }
+  }
+
   const isPublic = PUBLIC.some((p) => path === p || (p !== "/" && path.startsWith(p + "/")));
   if (!user && !isPublic) {
     const url = req.nextUrl.clone(); url.pathname = "/connexion"; url.searchParams.set("suite", path);
